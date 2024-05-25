@@ -58,15 +58,20 @@ static uint64_t capability_flags;
 static FILE *pubkey, *privkey;
 static int verbose;
 
-uint8_t seed[32], public_key[32], private_key[64];
+uint8_t public_key[32], private_key[64];
 
 static int generate(const char *argv0) {
+  static uint8_t zeros[32];
   uint8_t seed[32];
+
+  memset(seed, 0, sizeof(seed));
 
   if (ed25519_create_seed(seed)) {
     fprintf(stderr, "%s: error while generating seed\n", argv0);
     return -errno;
   }
+
+  assert(memcmp(seed, zeros, sizeof(seed)) != 0);
 
   ed25519_create_keypair(public_key, private_key, seed);
 
