@@ -128,8 +128,11 @@ static int _otp_board_info_get_public_key(otp_ports_t &ports,
   // layout is public_key || serial number || MAC addresses
   // Ed25519 public key is 32 bytes == 8 words
 
-  uint32_t address =
-      info.address - (otp_board_info_get_num_macs(info) * 2 + 1 + 8);
+  uint32_t address = info.address - otp_board_info_get_num_macs(info) * 2;
+  if (otp_board_info_has_serial(info))
+    address--;
+
+  address -= 8;
 
   // TODO: check endianness
   for (unsigned int i = 0; i < 8; i++) {
@@ -149,10 +152,13 @@ int _cap_otp_get_board_info(otp_ports_t &ports,
   board_info_header_t info;
 
   if (!otp_board_info_get_header(ports, info) ||
-      !_otp_board_info_get_serial(ports, info, serial) ||
       !_otp_board_info_get_mac(ports, info, mac_index, mac_address) ||
       !_otp_board_info_get_public_key(ports, info, public_key))
     return 0;
+
+  // serial number is optional
+  if (!_otp_board_info_get_serial(ports, info, serial))
+    serial = 0;
 
   return 1;
 }
