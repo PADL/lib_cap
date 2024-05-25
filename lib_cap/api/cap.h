@@ -32,8 +32,10 @@
  * \return Returns 1 on success, 0 on failure.
  */
 
+#define CAPABILITY_LEN 72
+
 int cap_validate(REFERENCE_PARAM(otp_ports_t, ports),
-                 const uint8_t capability[72],
+                 const uint8_t capability[CAPABILITY_LEN],
                  REFERENCE_PARAM(uint32_t, serial),
                  uint32_t mac_index,
                  uint8_t mac_address[6],

@@ -9,20 +9,21 @@
 
 #include "cap_internal.h"
 
-static uint8_t key_usage[14] = CAP_KEY_USAGE;
+static uint8_t key_usage[] = CAP_KEY_USAGE;
 
-static inline int _cap_verify_signature(const uint8_t signature[64],
-                                        unsigned int payload_len,
-                                        const uint8_t payload[payload_len],
-                                        const uint8_t public_key[32]) {
+[[always_inline]] static inline int
+_cap_verify_signature(const uint8_t signature[64],
+                      unsigned int payload_len,
+                      const uint8_t payload[payload_len],
+                      const uint8_t public_key[32]) {
   return ed25519_verify(signature, payload, payload_len, public_key);
 }
 
-int _cap_validate_internal(const uint8_t capability[72],
-                           uint32_t serial,
-                           const uint8_t mac_address[6],
-                           const uint8_t public_key[32],
-                           uint64_t &capability_flags) {
+static inline int _cap_validate_internal(const uint8_t capability[CAPABILITY_LEN],
+                                         uint32_t serial,
+                                         const uint8_t mac_address[6],
+                                         const uint8_t public_key[32],
+                                         uint64_t &capability_flags) {
   uint8_t payload[CAP_PAYLOAD_LEN];
 
   capability_flags = 0;
@@ -50,7 +51,7 @@ int _cap_validate_internal(const uint8_t capability[72],
 // read serial, MAC address and public key from OTP and call
 // _cap_validate_internal()
 int cap_validate(otp_ports_t &ports,
-                 const uint8_t capability[72],
+                 const uint8_t capability[CAPABILITY_LEN],
                  uint32_t &serial,
                  uint32_t mac_index,
                  uint8_t mac_address[6],
