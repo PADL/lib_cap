@@ -37,7 +37,8 @@ int _cap_validate_internal(const uint8_t capability[72],
   memcpy(&payload[sizeof(key_usage) + sizeof(serial)], mac_address, 6);
   memcpy(&payload[sizeof(key_usage) + sizeof(serial) + 6], capability, 8);
 
-  if (!_cap_verify_signature(&capability[8], sizeof(payload), payload, public_key))
+  if (!_cap_verify_signature(&capability[8], sizeof(payload), payload,
+                             public_key))
     return 0;
 
   for (unsigned int i = 0; i < sizeof(capability_flags); i++)

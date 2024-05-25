@@ -7,7 +7,8 @@
 
 #include "ed25519/ed25519.h"
 
-#define CAP_KEY_USAGE {'x', 'm', 'o', 's', 'c', 'a', 'p', 'a', 'b', 'i', 'l', 'i', 't', 'y'}
+#define CAP_KEY_USAGE                                                          \
+  { 'x', 'm', 'o', 's', 'c', 'a', 'p', 'a', 'b', 'i', 'l', 'i', 't', 'y' }
 
 #define CAP_PAYLOAD_LEN 32
 
