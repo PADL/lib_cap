@@ -1,0 +1,7 @@
+.DS_Store
+.deps/
+.dirstamp
+.libs/
+lib_cap/tools/xcaptool
+lib_cap/tools/xcaptool.dSYM/
+.*.sw?

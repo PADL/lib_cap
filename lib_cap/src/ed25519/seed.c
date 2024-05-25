@@ -10,6 +10,8 @@
 #endif
 
 int ed25519_create_seed(unsigned char *seed) {
+    int ret;
+
 #ifdef _WIN32
     HCRYPTPROV prov;
 
@@ -23,6 +25,7 @@ int ed25519_create_seed(unsigned char *seed) {
     }
 
     CryptReleaseContext(prov, 0);
+    ret = 0;
 #else
     FILE *f = fopen("/dev/urandom", "rb");
 
@@ -30,11 +33,17 @@ int ed25519_create_seed(unsigned char *seed) {
         return 1;
     }
 
-    fread(seed, 1, 32, f);
+    if (fread(seed, 1, 32, f) != 32) {
+        fprintf(stderr, "failed to read from entropy source\n");
+        ret = 1;
+    } else {
+        ret = 0;
+    }
+
     fclose(f);
 #endif
 
-    return 0;
+    return ret;
 }
 
 #endif

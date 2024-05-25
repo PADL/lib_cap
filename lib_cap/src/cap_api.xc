@@ -9,23 +9,21 @@
 
 #include "cap_internal.h"
 
-static uint8_t key_usage[14] = {'x', 'm', 'o', 's', 'c', 'a', 'p',
-                                'a', 'b', 'i', 'l', 'i', 't', 'y'};
+static uint8_t key_usage[14] = CAP_KEY_USAGE;
 
-static inline int _cap_verify_signature(uint8_t signature[64],
+static inline int _cap_verify_signature(const uint8_t signature[64],
                                         unsigned int payload_len,
-                                        uint8_t payload[payload_len],
-                                        uint8_t public_key[32]) {
+                                        const uint8_t payload[payload_len],
+                                        const uint8_t public_key[32]) {
   return ed25519_verify(signature, payload, payload_len, public_key);
 }
 
-int _cap_validate_internal(uint8_t capability[72],
+int _cap_validate_internal(const uint8_t capability[72],
                            uint32_t serial,
-                           uint8_t mac_address[6],
-                           uint8_t public_key[32],
+                           const uint8_t mac_address[6],
+                           const uint8_t public_key[32],
                            uint64_t &capability_flags) {
-  uint8_t signature[64];
-  uint8_t payload[32];
+  uint8_t payload[CAP_PAYLOAD_LEN];
 
   capability_flags = 0;
 
@@ -39,8 +37,7 @@ int _cap_validate_internal(uint8_t capability[72],
   memcpy(&payload[sizeof(key_usage) + sizeof(serial)], mac_address, 6);
   memcpy(&payload[sizeof(key_usage) + sizeof(serial) + 6], capability, 8);
 
-  memcpy(signature, &capability[8], sizeof(signature));
-  if (!_cap_verify_signature(signature, sizeof(payload), payload, public_key))
+  if (!_cap_verify_signature(&capability[8], sizeof(payload), payload, public_key))
     return 0;
 
   for (unsigned int i = 0; i < sizeof(capability_flags); i++)
@@ -52,7 +49,7 @@ int _cap_validate_internal(uint8_t capability[72],
 // read serial, MAC address and public key from OTP and call
 // _cap_validate_internal()
 int cap_validate(otp_ports_t &ports,
-                 uint8_t capability[72],
+                 const uint8_t capability[72],
                  uint32_t &serial,
                  uint32_t mac_index,
                  uint8_t mac_address[6],
