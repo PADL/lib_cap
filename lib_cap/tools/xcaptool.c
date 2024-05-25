@@ -45,7 +45,7 @@ static void __attribute__((__noreturn__)) usage(const char *argv0) {
       stderr,
       "usage: %s [--command=generate|sign|verify] [--private-key-file=path]\n"
       "          [--public-key-file=path] [--mac-address=aa:bb:cc:dd:ee:ff]\n"
-      "          [--serial=aabbccddee] [--capability-flags=...] [--verbose]\n",
+      "          [--serial=0x12345678] [--capability-flags=0x...] [--verbose]\n",
       argv0);
   exit(EINVAL);
 }
