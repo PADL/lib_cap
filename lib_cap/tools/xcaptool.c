@@ -13,6 +13,17 @@
 #include "cap_internal.h"
 #include "base64.h"
 
+#ifdef __linux__
+int memset_s(void *s, size_t smax, int c, size_t n) {
+  volatile uint8_t *p = s;
+
+  while (n--)
+    *p++ = c;
+
+  return 0;
+}
+#endif
+
 static struct option longopts[] = {
     {"command", required_argument, NULL, 'c'},
     {"private-key-file", required_argument, NULL, 'p'},
