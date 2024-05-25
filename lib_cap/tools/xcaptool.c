@@ -74,6 +74,7 @@ static int generate(const char *argv0) {
   assert(memcmp(seed, zeros, sizeof(seed)) != 0);
 
   ed25519_create_keypair(public_key, private_key, seed);
+  memset_s(seed, sizeof(seed), 0, sizeof(seed));
 
   if (fwrite(public_key, sizeof(public_key), 1, pubkey) != 1 ||
       fwrite(private_key, sizeof(private_key), 1, privkey) != 1) {
