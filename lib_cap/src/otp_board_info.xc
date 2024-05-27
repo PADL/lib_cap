@@ -49,6 +49,25 @@ static uint32_t otp_read_word(otp_ports_t &ports, uint32_t address) {
   return value;
 }
 
+//
+// OTP bitmask layout:
+//
+// 31       23       15       7
+// 76543210 76543210 76543210 76543210
+// 0VLLLLLM MMSP.... ........ ........
+//
+// 0 MBZ
+// V header valid
+// L length
+// M number of MAC addresses
+// S serial number valid
+// P public key valid
+//
+// OTP layout [item](32-bit words):
+//
+// [public_key](P?4:0) [serial_number](S?1:0) [mac_address](M*2) [bitmask](4)
+//
+
 /// Search the end of the OTP for a valid board info header.
 static int otp_board_info_get_header(otp_ports_t &ports,
                                      board_info_header_t &info) {
