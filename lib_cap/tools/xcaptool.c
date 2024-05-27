@@ -28,6 +28,7 @@ static struct option longopts[] = {
     {"command", required_argument, NULL, 'c'},
     {"private-key-file", required_argument, NULL, 'p'},
     {"public-key-file", required_argument, NULL, 'P'},
+    {"vendor-id", required_argument, NULL, 'i'},
     {"mac-address", optional_argument, NULL, 'm'},
     {"serial", optional_argument, NULL, 's'},
     {"capability-flags", optional_argument, NULL, 'f'},
@@ -44,13 +45,15 @@ static void __attribute__((__noreturn__)) usage(const char *argv0) {
   fprintf(
       stderr,
       "usage: %s [--command=generate|sign|verify] [--private-key-file=path]\n"
-      "          [--public-key-file=path] [--mac-address=aa:bb:cc:dd:ee:ff]\n"
-      "          [--serial=0x12345678] [--capability-flags=0x...] [--verbose]\n",
+      "          [--public-key-file=path] [--vendor-id=0x...]\n"
+      "          [--mac-address=aa:bb:cc:dd:ee:ff] [--serial=0xaabbccdd]\n"
+      "          [--capability-flags=...] [--verbose]\n",
       argv0);
   exit(EINVAL);
 }
 
 static command_t cmd = INVALID;
+static uint64_t vendor_id;
 static uint8_t zero_mac[6];
 static uint8_t mac_address[6];
 static uint32_t serial;
@@ -108,51 +111,63 @@ static int read_private_key(const char *argv0) {
   return 0;
 }
 
-static uint8_t key_usage[14] = CAP_KEY_USAGE;
+static uint8_t key_usage[6] = CAP_KEY_USAGE;
 
-static void make_payload(uint32_t serial,
+static void encode_le32(uint8_t dst[4], uint64_t val) {
+  dst[0] = (val >> 0) & 0xff;
+  dst[1] = (val >> 8) & 0xff;
+  dst[2] = (val >> 16) & 0xff;
+  dst[3] = (val >> 24) & 0xff;
+}
+
+static void encode_le64(uint8_t dst[8], uint64_t val) {
+  dst[0] = (val >> 0) & 0xff;
+  dst[1] = (val >> 8) & 0xff;
+  dst[2] = (val >> 16) & 0xff;
+  dst[3] = (val >> 24) & 0xff;
+  dst[4] = (val >> 32) & 0xff;
+  dst[5] = (val >> 40) & 0xff;
+  dst[6] = (val >> 48) & 0xff;
+  dst[7] = (val >> 56) & 0xff;
+}
+
+static void make_payload(uint64_t vendor_id,
+                         uint32_t serial,
                          const uint8_t mac_address[6],
                          uint64_t capability_flags,
                          uint8_t payload[CAP_PAYLOAD_LEN]) {
   memcpy(payload, key_usage, sizeof(key_usage));
+  assert(sizeof(key_usage) == 6);
 
-  payload[sizeof(key_usage)] = (serial >> 0) & 0xff;
-  payload[sizeof(key_usage) + 1] = (serial >> 8) & 0xff;
-  payload[sizeof(key_usage) + 2] = (serial >> 16) & 0xff;
-  payload[sizeof(key_usage) + 3] = (serial >> 24) & 0xff;
-
-  memcpy(&payload[sizeof(key_usage) + 4], mac_address, 6);
-
-  payload[sizeof(key_usage) + 10] = (capability_flags >> 0) & 0xff;
-  payload[sizeof(key_usage) + 11] = (capability_flags >> 8) & 0xff;
-  payload[sizeof(key_usage) + 12] = (capability_flags >> 16) & 0xff;
-  payload[sizeof(key_usage) + 13] = (capability_flags >> 24) & 0xff;
-  payload[sizeof(key_usage) + 14] = (capability_flags >> 32) & 0xff;
-  payload[sizeof(key_usage) + 15] = (capability_flags >> 40) & 0xff;
-  payload[sizeof(key_usage) + 16] = (capability_flags >> 48) & 0xff;
-  payload[sizeof(key_usage) + 17] = (capability_flags >> 56) & 0xff;
-
-  assert(sizeof(key_usage) + 18 == CAP_PAYLOAD_LEN);
+  encode_le64(&payload[sizeof(key_usage)], vendor_id);
+  encode_le32(&payload[sizeof(key_usage) + sizeof(vendor_id)], serial);
+  memcpy(&payload[sizeof(key_usage) + sizeof(vendor_id) + sizeof(serial)],
+         mac_address, 6);
+  encode_le64(
+      &payload[sizeof(key_usage) + sizeof(vendor_id) + sizeof(serial) + 6],
+      capability_flags);
 }
 
-// "xmoscapability" || serial || mac_address || capability_flags
-static void make_capability(uint32_t serial,
+// "xmos\0" || 0x1 || vendor_id || serial || mac_address || capability_flags
+static void make_capability(uint64_t vendor_id,
+                            uint32_t serial,
                             const uint8_t mac_address[6],
                             uint64_t capability_flags,
-                            uint8_t capability[72],
+                            uint8_t capability[80],
                             const uint8_t *public_key,
                             const uint8_t *private_key) {
   uint8_t payload[CAP_PAYLOAD_LEN];
 
-  make_payload(serial, mac_address, capability_flags, payload);
-  memcpy(capability, &payload[24], 8);
-  ed25519_sign(&capability[8], payload, CAP_PAYLOAD_LEN, public_key,
+  make_payload(vendor_id, serial, mac_address, capability_flags, payload);
+  memcpy(&capability[0], &payload[0], 8);
+  memcpy(&capability[8], &payload[24], 8);
+  ed25519_sign(&capability[16], payload, CAP_PAYLOAD_LEN, public_key,
                private_key);
 }
 
 static int sign(const char *argv0) {
   int ret;
-  uint8_t capability[72];
+  uint8_t capability[80];
   char *cap_string;
 
   ret = read_public_key(argv0);
@@ -163,13 +178,14 @@ static int sign(const char *argv0) {
   if (ret)
     return ret;
 
-  make_capability(serial, mac_address, capability_flags, capability, public_key,
-                  private_key);
+  make_capability(vendor_id, serial, mac_address, capability_flags, capability,
+                  public_key, private_key);
 
   if (base64_encode(capability, sizeof(capability), &cap_string) < 0)
     return -errno;
 
   if (verbose) {
+    printf("# Vendor ID: %016llx\n", vendor_id);
     printf("# Serial number: %08x\n", serial);
     printf("# MAC address: %02x:%02x:%02x:%02x:%02x:%02x\n", mac_address[0],
            mac_address[1], mac_address[2], mac_address[3], mac_address[4],
@@ -184,7 +200,7 @@ static int sign(const char *argv0) {
 }
 
 static int verify(const char *argv0) {
-  uint8_t capability[72];
+  uint8_t capability[80];
   uint8_t payload[CAP_PAYLOAD_LEN];
   char buf[BUFSIZ];
   int read = 0;
@@ -207,7 +223,7 @@ static int verify(const char *argv0) {
       buf[len] = '\0';
     }
 
-    if (len != 96) {
+    if (len != 108) {
       fprintf(stderr, "%s: invalid capability string '%s'\n", argv0, buf);
       return -ERANGE;
     }
@@ -224,17 +240,17 @@ static int verify(const char *argv0) {
 
   memcpy(payload, key_usage, sizeof(key_usage));
 
-  payload[sizeof(key_usage)] = (serial >> 0) & 0xff;
-  payload[sizeof(key_usage) + 1] = (serial >> 8) & 0xff;
-  payload[sizeof(key_usage) + 2] = (serial >> 16) & 0xff;
-  payload[sizeof(key_usage) + 3] = (serial >> 24) & 0xff;
+  encode_le64(&payload[sizeof(key_usage)], vendor_id);
+  encode_le32(&payload[sizeof(key_usage) + sizeof(vendor_id)], serial);
+  memcpy(&payload[sizeof(key_usage) + sizeof(vendor_id) + sizeof(serial)],
+         mac_address, 6);
+  memcpy(&payload[sizeof(key_usage) + sizeof(vendor_id) + sizeof(serial) + 6],
+         &capability[8], 8);
 
-  memcpy(&payload[sizeof(key_usage) + 4], mac_address, 6);
-  memcpy(&payload[sizeof(key_usage) + 10], capability, 8);
+  assert(sizeof(key_usage) + sizeof(vendor_id) + sizeof(serial) + 6 + 8 ==
+         CAP_PAYLOAD_LEN);
 
-  assert(sizeof(key_usage) + 18 == CAP_PAYLOAD_LEN);
-
-  if (!ed25519_verify(&capability[8], payload, CAP_PAYLOAD_LEN, public_key)) {
+  if (!ed25519_verify(&capability[16], payload, CAP_PAYLOAD_LEN, public_key)) {
     fprintf(stderr, "%s: capability verification failed\n", argv0);
     return -EPERM;
   }
@@ -273,6 +289,14 @@ int main(int argc, char *argv[]) {
       break;
     case 'P':
       pubkey_path = optarg;
+      break;
+    case 'i':
+      if (strncasecmp(optarg, "0x", 2) == 0) {
+        if (sscanf(&optarg[2], "%llx%*c", &vendor_id) != 1)
+          usage(argv[0]);
+      } else {
+        vendor_id = atoll(optarg);
+      }
       break;
     case 'm':
       if (sscanf(optarg, "%hhx:%hhx:%hhx:%hhx:%hhx:%hhx%*c", &mac_address[0],
@@ -330,7 +354,12 @@ int main(int argc, char *argv[]) {
   if (cmd == GENERATE) {
     ret = generate(argv[0]);
   } else if (cmd == SIGN || cmd == VERIFY) {
-    if (cmd == SIGN && serial == 0 && memcmp(mac_address, zero_mac, 6) == 0) {
+    if (vendor_id == 0) {
+      fprintf(stderr, "%s: a valid (non-zero) vendor ID must be specified\n",
+              argv[0]);
+      exit(EINVAL);
+    } else if (cmd == SIGN && serial == 0 &&
+               memcmp(mac_address, zero_mac, 6) == 0) {
       fprintf(stderr,
               "%s: will not issue capability if both serial and MAC address "
               "are unspecified\n",

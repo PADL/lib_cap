@@ -7,8 +7,9 @@
 
 #include "ed25519/ed25519.h"
 
+// XMOS tag and version
 #define CAP_KEY_USAGE                                                          \
-  { 'x', 'm', 'o', 's', 'c', 'a', 'p', 'a', 'b', 'i', 'l', 'i', 't', 'y' }
+  { 'x', 'm', 'o', 's', '\0', 0x01 }
 
 #define CAP_PAYLOAD_LEN 32
 

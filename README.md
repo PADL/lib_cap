@@ -8,6 +8,7 @@ Add `lib_cap(>=0.0.1)` to your module dependencies. There is a single API:
 
 ```c
 int cap_validate(REFERENCE_PARAM(otp_ports_t, ports),
+                 uint64_t vendor_id,
                  const uint8_t capability[72],
                  REFERENCE_PARAM(uint32_t, serial),
                  uint32_t mac_index,
@@ -44,7 +45,7 @@ Capability flags are application defined; typically, they will represent a set o
 Capabilities are output base64-encoded. They should be decoded to binary before storing on the device.
 
 ```
-xcaptool --command=sign --private-key-file=privkey --public-key-file=pubkey --serial=0x1234 --mac-address=00:aa:bb:11:cc:ee --capability-flags=12345
+xcaptool --command=sign --private-key-file=privkey --public-key-file=pubkey --serial=0x1234 --mac-address=00:aa:bb:11:cc:ee --capability-flags=0x12345 --vendor-id=0xaabbcc
 ```
 
 ### Verifying a capability
@@ -52,7 +53,7 @@ xcaptool --command=sign --private-key-file=privkey --public-key-file=pubkey --se
 A capability may be verified as follows:
 
 ```
-xcaptool --command=verify --private-key-file=privkey --public-key-file=pubkey --serial=0x1234 --mac-address=00:aa:bb:11:cc:ee --capability-flags=12345
+xcaptool --command=verify --private-key-file=privkey --public-key-file=pubkey --serial=0x1234 --mac-address=00:aa:bb:11:cc:ee --capability-flags=0x12345 --vendor-id=0xaabbcc
 ```
 
 This logic is similar to that used by the XMOS library.
