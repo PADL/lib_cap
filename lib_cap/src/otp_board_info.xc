@@ -49,18 +49,28 @@ static uint32_t otp_read_word(otp_ports_t &ports, uint32_t address) {
   return value;
 }
 
+// Example:
+// 0x000007fc: 0x000c0111
+// 0x000007fd: 0x978014ac
+// 0x000007fe: 0x00000022
+// 0x000007ff: 0x4857ffff
+// SecConfReg: 0x00000000
+
 //
 // OTP bitmask layout:
 //
 // 31       23       15       7
 // 76543210 76543210 76543210 76543210
-// 0VLLLLLM MMSP.... ........ ........
+// 0VLLLLLM MMS1P... 11111111 11111111
+//
+// Example (0x4857ffff)
+// 01001000 01010111 11111111 11111111
 //
 // 0 MBZ
 // V header valid
-// L length
-// M number of MAC addresses
-// S serial number valid
+// L length (4 words)
+// M number of MAC addresses (1)
+// S serial number valid (0)
 // P public key valid
 //
 // OTP layout [item](32-bit words):
@@ -134,8 +144,7 @@ static int _otp_board_info_get_serial(otp_ports_t &ports,
 }
 
 static int otp_board_info_has_public_key(const board_info_header_t &info) {
-  // TODO: check this bit is free
-  return (info.bitmap >> 20) & 1;
+  return (info.bitmap >> 19) & 1;
 }
 
 static int _otp_board_info_get_public_key(otp_ports_t &ports,
