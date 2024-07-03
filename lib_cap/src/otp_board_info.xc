@@ -61,7 +61,7 @@ static uint32_t otp_read_word(otp_ports_t &ports, uint32_t address) {
 //
 // 31       23       15       7
 // 76543210 76543210 76543210 76543210
-// 0VLLLLLM MMS1P... 11111111 11111111
+// 0VLLLLLM MMS..... ........ ........
 //
 // Example (0x4857ffff)
 // 01001000 01010111 11111111 11111111
