@@ -148,7 +148,8 @@ static void make_payload(uint64_t vendor_id,
       capability_flags);
 }
 
-// "xmos\0" || 0x1 || vendor_id || serial || mac_address || capability_flags
+// payload: "xmos\0\1" || vendor_id || serial || mac_address || capability_flags
+// capability: vendor_id || capability_flags || signature
 static void make_capability(uint64_t vendor_id,
                             uint32_t serial,
                             const uint8_t mac_address[6],
@@ -159,8 +160,8 @@ static void make_capability(uint64_t vendor_id,
   uint8_t payload[CAP_PAYLOAD_LEN];
 
   make_payload(vendor_id, serial, mac_address, capability_flags, payload);
-  memcpy(&capability[0], &payload[0], 8);
-  memcpy(&capability[8], &payload[24], 8);
+  memcpy(&capability[0], &payload[sizeof(key_usage)], 8);
+  memcpy(&capability[8], &payload[CAP_PAYLOAD_LEN - 8], 8);
   ed25519_sign(&capability[16], payload, CAP_PAYLOAD_LEN, public_key,
                private_key);
 }
