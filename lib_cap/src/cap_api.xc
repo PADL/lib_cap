@@ -57,30 +57,30 @@ _cap_validate_internal(const uint8_t capability[CAPABILITY_LEN],
   return 1;
 }
 
-// read serial, MAC address and public key from OTP and call
-// _cap_validate_internal()
-int cap_validate(otp_ports_t &ports,
-                 uint64_t vendor_id,
-                 const uint8_t capability[CAPABILITY_LEN],
-                 uint32_t &serial,
-                 uint32_t mac_index,
-                 uint8_t mac_address[6],
-                 uint64_t &capability_flags) {
+// first check the vendor_id matches, otherwise no point verifying signature
+static int _cap_validate_vendor_id(uint64_t vendor_id,
+                                   const uint8_t capability[CAPABILITY_LEN]) {
   uint64_t vendor_id_verify;
-  uint8_t public_key[32];
 
+  for (unsigned int i = 0; i < sizeof(vendor_id_verify); i++)
+    (vendor_id_verify, uint8_t[])[i] = capability[i];
+
+  return (vendor_id == vendor_id_verify);
+}
+
+// validate with a public key provided by the caller
+int cap_validate_pkey(const uint8_t public_key[32],
+                      uint64_t vendor_id,
+                      const uint8_t capability[CAPABILITY_LEN],
+                      uint32_t &serial,
+                      uint32_t mac_index,
+                      uint8_t mac_address[6],
+                      uint64_t &capability_flags) {
   serial = 0;
   memset(mac_address, 0, 6);
   capability_flags = 0;
 
-  // first check the vendor_id matches, otherwise no point verifying signature
-  for (unsigned int i = 0; i < sizeof(vendor_id_verify); i++)
-    (vendor_id_verify, uint8_t[])[i] = capability[i];
-  if (vendor_id != vendor_id_verify)
-    return 0;
-
-  if (!_cap_otp_get_board_info(ports, serial, mac_index, mac_address,
-                               public_key))
+  if (!_cap_validate_vendor_id(vendor_id, capability))
     return 0;
 
   if (!_cap_validate_internal(capability, vendor_id, serial, mac_address,
@@ -88,4 +88,27 @@ int cap_validate(otp_ports_t &ports,
     return 0;
 
   return 1;
+}
+
+// read serial, MAC address and public key from OTP and call
+// _cap_validate_internal()
+int cap_validate_otp(otp_ports_t &ports,
+                     uint64_t vendor_id,
+                     const uint8_t capability[CAPABILITY_LEN],
+                     uint32_t &serial,
+                     uint32_t mac_index,
+                     uint8_t mac_address[6],
+                     uint64_t &capability_flags) {
+  uint8_t public_key[32];
+
+  serial = 0;
+  memset(mac_address, 0, 6);
+  capability_flags = 0;
+
+  if (!_cap_otp_get_board_info(ports, serial, mac_index, mac_address,
+                               public_key))
+    return 0;
+
+  return cap_validate_pkey(public_key, vendor_id, capability, serial,
+                           mac_index, mac_address, capability_flags);
 }
