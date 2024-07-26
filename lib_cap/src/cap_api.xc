@@ -3,7 +3,9 @@
 
 #include <inttypes.h>
 #include <string.h>
+#if LIBCAP_OTP
 #include <otp_board_info.h>
+#endif
 
 #include <cap.h>
 
@@ -90,6 +92,7 @@ int cap_validate_pkey(const uint8_t public_key[32],
   return 1;
 }
 
+#if LIBCAP_OTP
 // read serial, MAC address and public key from OTP and call
 // _cap_validate_internal()
 int cap_validate_otp(otp_ports_t &ports,
@@ -112,3 +115,4 @@ int cap_validate_otp(otp_ports_t &ports,
   return cap_validate_pkey(public_key, vendor_id, capability, serial,
                            mac_index, mac_address, capability_flags);
 }
+#endif

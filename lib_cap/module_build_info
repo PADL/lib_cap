@@ -1,8 +1,14 @@
 VERSION = 0.0.1
 
+ifeq ($(LIBCAP_OTP),true)
 DEPENDENT_MODULES = lib_otpinfo(>=2.1.0)
+endif
 
 MODULE_XCC_FLAGS = $(XCC_FLAGS) -DED25519_NO_SEED -Os
+
+ifeq ($(LIBCAP_OTP),true)
+MODULE_XCC_FLAGS += -DLIBCAP_OTP=1
+endif
 
 OPTIONAL_HEADERS += cap.h
 

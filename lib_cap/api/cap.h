@@ -4,7 +4,9 @@
 #pragma once
 
 #include <xccompat.h>
+#if LIBCAP_OTP
 #include <otp_board_info.h>
+#endif
 
 /**
  * Function for validating a "capability" blob against a serial number,
@@ -38,6 +40,7 @@
 
 #define CAPABILITY_LEN 80
 
+#if LIBCAP_OTP
 int cap_validate_otp(REFERENCE_PARAM(otp_ports_t, ports),
                      uint64_t vendor_id,
                      const uint8_t capability[CAPABILITY_LEN],
@@ -45,6 +48,7 @@ int cap_validate_otp(REFERENCE_PARAM(otp_ports_t, ports),
                      uint32_t mac_index,
                      uint8_t mac_address[6],
                      REFERENCE_PARAM(uint64_t, capability_flags));
+#endif
 
 int cap_validate_pkey(const uint8_t public_key[32],
                       uint64_t vendor_id,

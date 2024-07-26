@@ -2,6 +2,8 @@
 // Portions Copyright 2014-2021 XMOS LIMITED.
 // This Software is subject to the terms of the XMOS Public Licence: Version 1.
 
+#if LIBCAP_OTP
+
 #include <otp_board_info.h>
 #include <xs1.h>
 #include <xclib.h>
@@ -190,3 +192,5 @@ int _cap_otp_get_board_info(otp_ports_t &ports,
 
   return 1;
 }
+
+#endif
