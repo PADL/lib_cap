@@ -40,9 +40,9 @@ _cap_validate_internal(const uint8_t capability[CAPABILITY_LEN],
   memcpy(payload, key_usage, sizeof(key_usage));
 
   for (unsigned int i = 0; i < sizeof(vendor_id); i++)
-    payload[sizeof(key_usage) + i] = (serial, uint8_t[])[i];
+    payload[sizeof(key_usage) + i] = (vendor_id, uint8_t[])[i];
   for (unsigned int i = 0; i < sizeof(serial); i++)
-    payload[sizeof(key_usage) + sizeof(vendor_id) + i] = (serial, uint8_t[])[i];
+    payload[sizeof(key_usage) + sizeof(serial) + i] = (serial, uint8_t[])[i];
 
   memcpy(&payload[sizeof(key_usage) + sizeof(vendor_id) + sizeof(serial)],
          mac_address, 6);
