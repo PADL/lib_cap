@@ -54,6 +54,5 @@ int cap_validate_pkey(const uint8_t public_key[32],
                       uint64_t vendor_id,
                       const uint8_t capability[CAPABILITY_LEN],
                       uint32_t serial,
-                      uint32_t mac_index,
-                      uint8_t mac_address[6],
+                      const uint8_t mac_address[6],
                       REFERENCE_PARAM(uint64_t, capability_flags));

@@ -75,11 +75,8 @@ int cap_validate_pkey(const uint8_t public_key[32],
                       uint64_t vendor_id,
                       const uint8_t capability[CAPABILITY_LEN],
                       uint32_t serial,
-                      uint32_t mac_index,
-                      uint8_t mac_address[6],
+                      const uint8_t mac_address[6],
                       uint64_t &capability_flags) {
-  serial = 0;
-  memset(mac_address, 0, 6);
   capability_flags = 0;
 
   if (!_cap_validate_vendor_id(vendor_id, capability))
