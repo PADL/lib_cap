@@ -4,19 +4,34 @@
 
 ## module
 
-Add `lib_cap(>=0.0.1)` to your module dependencies. There is a single API:
+Add `lib_cap(>=0.0.1)` to your module dependencies.
+
+There are two APIs to choose from:
 
 ```c
-int cap_validate(REFERENCE_PARAM(otp_ports_t, ports),
-                 uint64_t vendor_id,
-                 const uint8_t capability[72],
-                 REFERENCE_PARAM(uint32_t, serial),
-                 uint32_t mac_index,
-                 uint8_t mac_address[6],
-                 REFERENCE_PARAM(uint64_t, capability_flags));
+int cap_validate_otp(REFERENCE_PARAM(otp_ports_t, ports),
+                     uint64_t vendor_id,
+                     const uint8_t capability[72],
+                     REFERENCE_PARAM(uint32_t, serial),
+                     uint32_t mac_index,
+                     uint8_t mac_address[6],
+                     REFERENCE_PARAM(uint64_t, capability_flags));
 ```
 
-`cap_validate` _returns_ the serial number and MAC address, for use elsewhere in the application; these are _not_ input parameters. The `capability` argument is the binary capability signed by the `xcaptool` command, and encodes both the capability flags and Ed25519 signature. The capability flags are returned in `capability_flags`.
+`cap_validate_otp` _returns_ the serial number and MAC address, for use elsewhere in the application; these are _not_ input parameters. The `capability` argument is the binary capability signed by the `xcaptool` command, and encodes both the capability flags and Ed25519 signature. The capability flags are returned in `capability_flags`.
+
+Alternatively, if you retrieve the serial number and MAC address elsewhere in your application, you can use:
+
+```c
+int cap_validate_pkey(const uint8_t public_key[32],
+                      uint64_t vendor_id,
+                      const uint8_t capability[CAPABILITY_LEN],
+                      uint32_t serial,
+                      const uint8_t mac_address[6],
+                      REFERENCE_PARAM(uint64_t, capability_flags));
+```
+
+which takes the serial number and MAC address as input-only parameters.
 
 ## xcaptool
 
