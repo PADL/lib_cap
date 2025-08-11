@@ -11,7 +11,7 @@
 
 #include "cap_internal.h"
 
-static uint8_t key_usage[] = CAP_KEY_USAGE;
+static uint8_t key_usage[6] = CAP_KEY_USAGE;
 
 [[always_inline]] static inline int
 _cap_verify_signature(const uint8_t signature[64],
@@ -21,6 +21,7 @@ _cap_verify_signature(const uint8_t signature[64],
   return ed25519_verify(signature, payload, payload_len, public_key);
 }
 
+#pragma unsafe arrays
 static inline int
 _cap_validate_internal(const uint8_t capability[CAPABILITY_LEN],
                        uint64_t vendor_id,
@@ -42,12 +43,12 @@ _cap_validate_internal(const uint8_t capability[CAPABILITY_LEN],
   for (unsigned int i = 0; i < sizeof(vendor_id); i++)
     payload[sizeof(key_usage) + i] = (vendor_id, uint8_t[])[i];
   for (unsigned int i = 0; i < sizeof(serial); i++)
-    payload[sizeof(key_usage) + sizeof(serial) + i] = (serial, uint8_t[])[i];
+    payload[sizeof(key_usage) + sizeof(vendor_id) + i] = (serial, uint8_t[])[i];
 
   memcpy(&payload[sizeof(key_usage) + sizeof(vendor_id) + sizeof(serial)],
          mac_address, 6);
   memcpy(&payload[sizeof(key_usage) + sizeof(vendor_id) + sizeof(serial) + 6],
-         capability, 8);
+         &capability[8], 8);
 
   if (!_cap_verify_signature(&capability[16], sizeof(payload), payload,
                              public_key))
@@ -60,6 +61,7 @@ _cap_validate_internal(const uint8_t capability[CAPABILITY_LEN],
 }
 
 // first check the vendor_id matches, otherwise no point verifying signature
+#pragma unsafe arrays
 static int _cap_validate_vendor_id(uint64_t vendor_id,
                                    const uint8_t capability[CAPABILITY_LEN]) {
   uint64_t vendor_id_verify;
