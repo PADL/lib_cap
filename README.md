@@ -11,7 +11,7 @@ There are two APIs to choose from:
 ```c
 int cap_validate_otp(REFERENCE_PARAM(otp_ports_t, ports),
                      uint64_t vendor_id,
-                     const uint8_t capability[72],
+                     const uint8_t capability[CAPABILITY_LEN],
                      REFERENCE_PARAM(uint32_t, serial),
                      uint32_t mac_index,
                      uint8_t mac_address[6],
