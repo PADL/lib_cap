@@ -171,7 +171,7 @@ static int _otp_board_info_get_public_key(otp_ports_t &ports,
       public_key[4 * i + j] = (value, uint8_t[])[j];
   }
 
-  return 0;
+  return 1;
 }
 
 int _cap_otp_get_board_info(otp_ports_t &ports,

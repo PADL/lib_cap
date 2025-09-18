@@ -112,6 +112,6 @@ int cap_validate_otp(otp_ports_t &ports,
     return 0;
 
   return cap_validate_pkey(public_key, vendor_id, capability, serial,
-                           mac_index, mac_address, capability_flags);
+                           mac_address, capability_flags);
 }
 #endif
