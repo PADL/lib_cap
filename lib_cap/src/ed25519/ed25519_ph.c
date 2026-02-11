@@ -1,5 +1,8 @@
 #include "ed25519-private.h"
 
+#define Flag_Ed25519ctx 0
+#define Flag_Ed25519ph 1
+
 void ed25519ph_init(ed25519_context *ctx) { sha512_init(&ctx->hash); }
 
 void ed25519ph_update(ed25519_context *ctx,
@@ -15,7 +18,7 @@ void ed25519ph_sign(ed25519_context *ctx,
                     const uint8_t *public_key,
                     const uint8_t *private_key) {
   uint8_t message[64];
-  uint8_t flag = 1;
+  uint8_t flag = Flag_Ed25519ph;
 
   sha512_final(&ctx->hash, message);
   __ed25519ctx_sign(signature, message, sizeof(message), public_key,
@@ -28,7 +31,7 @@ int ed25519ph_verify(ed25519_context *ctx,
                      uint8_t context_len,
                      const uint8_t *public_key) {
   uint8_t message[64];
-  uint8_t flag = 1;
+  uint8_t flag = Flag_Ed25519ph;
 
   sha512_final(&ctx->hash, message);
   return __ed25519ctx_verify(signature, message, sizeof(message), public_key,
