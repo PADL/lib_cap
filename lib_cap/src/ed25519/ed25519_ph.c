@@ -17,8 +17,8 @@ void ed25519ph_sign(ed25519_context *ctx,
                     uint8_t context_len,
                     const uint8_t *public_key,
                     const uint8_t *private_key) {
+  static const uint8_t flag = Flag_Ed25519ph;
   uint8_t message[64];
-  uint8_t flag = Flag_Ed25519ph;
 
   sha512_final(&ctx->hash, message);
   __ed25519ctx_sign(signature, message, sizeof(message), public_key,
@@ -30,8 +30,8 @@ int ed25519ph_verify(ed25519_context *ctx,
                      const uint8_t *context,
                      uint8_t context_len,
                      const uint8_t *public_key) {
+  static const uint8_t flag = Flag_Ed25519ph;
   uint8_t message[64];
-  uint8_t flag = Flag_Ed25519ph;
 
   sha512_final(&ctx->hash, message);
   return __ed25519ctx_verify(signature, message, sizeof(message), public_key,
