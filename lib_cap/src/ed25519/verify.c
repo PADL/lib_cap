@@ -24,6 +24,8 @@
 
 #include "ed25519-private.h"
 
+uint8_t dom2_prefix[32] = "SigEd25519 no Ed25519 collisions";
+
 static int consttime_equal(const uint8_t *x, const uint8_t *y) {
   uint8_t r = 0;
 

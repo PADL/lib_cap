@@ -24,8 +24,6 @@
 
 #include "ed25519-private.h"
 
-uint8_t dom2_prefix[32] = "SigEd25519 no Ed25519 collisions";
-
 void __ed25519ctx_sign(
     uint8_t *signature,
     const uint8_t *message,
