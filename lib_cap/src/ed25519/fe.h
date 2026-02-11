@@ -11,9 +11,7 @@
     Bounds on each t[i] vary depending on context.
 */
 
-
 typedef int32_t fe[10];
-
 
 void fe_0(fe h);
 void fe_1(fe h);

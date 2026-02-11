@@ -16,8 +16,7 @@ void __ed25519ctx_sign(
     const uint8_t *private_key,
     const uint8_t *flag, /* non-NULL indicates ed25519ctx/ed25519ph */
     const uint8_t *context,
-    uint8_t context_len
-);
+    uint8_t context_len);
 
 int __ed25519ctx_verify(
     const uint8_t *signature,
@@ -26,7 +25,6 @@ int __ed25519ctx_verify(
     const uint8_t *public_key,
     const uint8_t *flag, /* non-NULL indicates ed25519ctx/ed25519ph */
     const uint8_t *context,
-    uint8_t context_len
-);
+    uint8_t context_len);
 
 #endif
