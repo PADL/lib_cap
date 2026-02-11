@@ -9,7 +9,7 @@
  * Tom St Denis, tomstdenis@gmail.com, http://libtom.org
  */
 
-#include "fixedint.h"
+#include <stdint.h>
 #include "sha512.h"
 
 /* the K array */
@@ -63,10 +63,10 @@ static const uint64_t K[80] = {
       ((x)<<((uint64_t)(64-((y)&UINT64_C(63)))))) & UINT64_C(0xFFFFFFFFFFFFFFFF))
 
 #define STORE64H(x, y)                                                                     \
-   { (y)[0] = (unsigned char)(((x)>>56)&255); (y)[1] = (unsigned char)(((x)>>48)&255);     \
-     (y)[2] = (unsigned char)(((x)>>40)&255); (y)[3] = (unsigned char)(((x)>>32)&255);     \
-     (y)[4] = (unsigned char)(((x)>>24)&255); (y)[5] = (unsigned char)(((x)>>16)&255);     \
-     (y)[6] = (unsigned char)(((x)>>8)&255); (y)[7] = (unsigned char)((x)&255); }
+   { (y)[0] = (uint8_t)(((x)>>56)&255); (y)[1] = (uint8_t)(((x)>>48)&255);     \
+     (y)[2] = (uint8_t)(((x)>>40)&255); (y)[3] = (uint8_t)(((x)>>32)&255);     \
+     (y)[4] = (uint8_t)(((x)>>24)&255); (y)[5] = (uint8_t)(((x)>>16)&255);     \
+     (y)[6] = (uint8_t)(((x)>>8)&255); (y)[7] = (uint8_t)((x)&255); }
 
 #define LOAD64H(x, y)                                                      \
    { x = (((uint64_t)((y)[0] & 255))<<56)|(((uint64_t)((y)[1] & 255))<<48) | \
@@ -88,7 +88,7 @@ static const uint64_t K[80] = {
 #endif
 
 /* compress 1024-bits */
-static int sha512_compress(sha512_context *md, unsigned char *buf)
+static int sha512_compress(sha512_context *md, uint8_t *buf)
 {
     uint64_t S[8], W[80], t0, t1;
     int i;
@@ -168,7 +168,7 @@ int sha512_init(sha512_context * md) {
    @param inlen  The length of the data (octets)
    @return 0 if successful
 */
-int sha512_update (sha512_context * md, const unsigned char *in, size_t inlen)               
+int sha512_update (sha512_context * md, const uint8_t *in, size_t inlen)               
 {                                                                                           
     size_t n;
     size_t i;                                                                        
@@ -180,7 +180,7 @@ int sha512_update (sha512_context * md, const unsigned char *in, size_t inlen)
     }                                                                                       
     while (inlen > 0) {                                                                     
         if (md->curlen == 0 && inlen >= 128) {                           
-           if ((err = sha512_compress (md, (unsigned char *)in)) != 0) {               
+           if ((err = sha512_compress (md, (uint8_t *)in)) != 0) {               
               return err;                                                                   
            }                                                                                
            md->length += 128 * 8;                                        
@@ -215,7 +215,7 @@ int sha512_update (sha512_context * md, const unsigned char *in, size_t inlen)
    @param out [out] The destination of the hash (64 bytes)
    @return 0 if successful
 */
-   int sha512_final(sha512_context * md, unsigned char *out)
+   int sha512_final(sha512_context * md, uint8_t *out)
    {
     int i;
 
@@ -230,7 +230,7 @@ int sha512_update (sha512_context * md, const unsigned char *in, size_t inlen)
  md->length += md->curlen * UINT64_C(8);
 
     /* append the '1' bit */
- md->buf[md->curlen++] = (unsigned char)0x80;
+ md->buf[md->curlen++] = (uint8_t)0x80;
 
     /* if the length is currently above 112 bytes we append zeros
      * then compress.  Then we can fall back to padding zeros and length
@@ -238,7 +238,7 @@ int sha512_update (sha512_context * md, const unsigned char *in, size_t inlen)
      */
      if (md->curlen > 112) {
         while (md->curlen < 128) {
-            md->buf[md->curlen++] = (unsigned char)0;
+            md->buf[md->curlen++] = (uint8_t)0;
         }
         sha512_compress(md, md->buf);
         md->curlen = 0;
@@ -249,7 +249,7 @@ int sha512_update (sha512_context * md, const unsigned char *in, size_t inlen)
      * > 2^64 bits of data... :-)
      */
 while (md->curlen < 120) {
-    md->buf[md->curlen++] = (unsigned char)0;
+    md->buf[md->curlen++] = (uint8_t)0;
 }
 
     /* store length */
@@ -264,7 +264,7 @@ for (i = 0; i < 8; i++) {
 return 0;
 }
 
-int sha512(const unsigned char *message, size_t message_len, unsigned char *out)
+int sha512(const uint8_t *message, size_t message_len, uint8_t *out)
 {
     sha512_context ctx;
     int ret;

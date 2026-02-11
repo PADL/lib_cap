@@ -5,10 +5,10 @@
 
 
 /* see http://crypto.stackexchange.com/a/6215/4697 */
-void ed25519_add_scalar(unsigned char *public_key, unsigned char *private_key, const unsigned char *scalar) {
-    const unsigned char SC_1[32] = {1}; /* scalar with value 1 */
+void ed25519_add_scalar(uint8_t *public_key, uint8_t *private_key, const uint8_t *scalar) {
+    const uint8_t SC_1[32] = {1}; /* scalar with value 1 */
     
-    unsigned char n[32]; 
+    uint8_t n[32]; 
     ge_p3 nB;
     ge_p1p1 A_p1p1;
     ge_p3 A;
@@ -16,7 +16,7 @@ void ed25519_add_scalar(unsigned char *public_key, unsigned char *private_key, c
     ge_cached T;
 
     sha512_context hash;
-    unsigned char hashbuf[64];
+    uint8_t hashbuf[64];
 
     int i;
 

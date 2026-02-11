@@ -4,10 +4,10 @@
 #include "sc.h"
 
 
-void ed25519_sign(unsigned char *signature, const unsigned char *message, size_t message_len, const unsigned char *public_key, const unsigned char *private_key) {
+void ed25519_sign(uint8_t *signature, const uint8_t *message, size_t message_len, const uint8_t *public_key, const uint8_t *private_key) {
     sha512_context hash;
-    unsigned char hram[64];
-    unsigned char r[64];
+    uint8_t hram[64];
+    uint8_t r[64];
     ge_p3 R;
 
 

@@ -51,16 +51,16 @@ typedef struct {
   fe T2d;
 } ge_cached;
 
-void ge_p3_tobytes(unsigned char *s, const ge_p3 *h);
-void ge_tobytes(unsigned char *s, const ge_p2 *h);
-int ge_frombytes_negate_vartime(ge_p3 *h, const unsigned char *s);
+void ge_p3_tobytes(uint8_t *s, const ge_p3 *h);
+void ge_tobytes(uint8_t *s, const ge_p2 *h);
+int ge_frombytes_negate_vartime(ge_p3 *h, const uint8_t *s);
 
 void ge_add(ge_p1p1 *r, const ge_p3 *p, const ge_cached *q);
 void ge_sub(ge_p1p1 *r, const ge_p3 *p, const ge_cached *q);
-void ge_double_scalarmult_vartime(ge_p2 *r, const unsigned char *a, const ge_p3 *A, const unsigned char *b);
+void ge_double_scalarmult_vartime(ge_p2 *r, const uint8_t *a, const ge_p3 *A, const uint8_t *b);
 void ge_madd(ge_p1p1 *r, const ge_p3 *p, const ge_precomp *q);
 void ge_msub(ge_p1p1 *r, const ge_p3 *p, const ge_precomp *q);
-void ge_scalarmult_base(ge_p3 *h, const unsigned char *a);
+void ge_scalarmult_base(ge_p3 *h, const uint8_t *a);
 
 void ge_p1p1_to_p2(ge_p2 *r, const ge_p1p1 *p);
 void ge_p1p1_to_p3(ge_p3 *r, const ge_p1p1 *p);

@@ -2,6 +2,7 @@
 #define ED25519_H
 
 #include <stddef.h>
+#include <stdint.h>
 
 #if defined(_WIN32)
     #if defined(ED25519_BUILD_DLL)
@@ -21,18 +22,18 @@ extern "C" {
 #endif
 
 #ifndef ED25519_NO_SEED
-int ED25519_DECLSPEC ed25519_create_seed(unsigned char *seed);
+int ED25519_DECLSPEC ed25519_create_seed(uint8_t *seed);
 #endif
 
 #ifndef __XC__
 #define unsafe
 #endif
 
-void ED25519_DECLSPEC ed25519_create_keypair(unsigned char *unsafe public_key, unsigned char *unsafe private_key, const unsigned char *unsafe seed);
-void ED25519_DECLSPEC ed25519_sign(unsigned char *unsafe signature, const unsigned char *unsafe message, size_t message_len, const unsigned char *unsafe public_key, const unsigned char *unsafe private_key);
-int ED25519_DECLSPEC ed25519_verify(const unsigned char *unsafe signature, const unsigned char *unsafe message, size_t message_len, const unsigned char *unsafe public_key);
-void ED25519_DECLSPEC ed25519_add_scalar(unsigned char *unsafe public_key, unsigned char *unsafe private_key, const unsigned char *unsafe scalar);
-void ED25519_DECLSPEC ed25519_key_exchange(unsigned char *unsafe shared_secret, const unsigned char *unsafe public_key, const unsigned char *unsafe private_key);
+void ED25519_DECLSPEC ed25519_create_keypair(uint8_t *unsafe public_key, uint8_t *unsafe private_key, const uint8_t *unsafe seed);
+void ED25519_DECLSPEC ed25519_sign(uint8_t *unsafe signature, const uint8_t *unsafe message, size_t message_len, const uint8_t *unsafe public_key, const uint8_t *unsafe private_key);
+int ED25519_DECLSPEC ed25519_verify(const uint8_t *unsafe signature, const uint8_t *unsafe message, size_t message_len, const uint8_t *unsafe public_key);
+void ED25519_DECLSPEC ed25519_add_scalar(uint8_t *unsafe public_key, uint8_t *unsafe private_key, const uint8_t *unsafe scalar);
+void ED25519_DECLSPEC ed25519_key_exchange(uint8_t *unsafe shared_secret, const uint8_t *unsafe public_key, const uint8_t *unsafe private_key);
 
 #ifdef __cplusplus
 }

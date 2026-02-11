@@ -22,7 +22,7 @@ void ge_add(ge_p1p1 *r, const ge_p3 *p, const ge_cached *q) {
 }
 
 
-static void slide(signed char *r, const unsigned char *a) {
+static void slide(signed char *r, const uint8_t *a) {
     int i;
     int b;
     int k;
@@ -64,7 +64,7 @@ and b = b[0]+256*b[1]+...+256^31 b[31].
 B is the Ed25519 base point (x,4/5) with x positive.
 */
 
-void ge_double_scalarmult_vartime(ge_p2 *r, const unsigned char *a, const ge_p3 *A, const unsigned char *b) {
+void ge_double_scalarmult_vartime(ge_p2 *r, const uint8_t *a, const ge_p3 *A, const uint8_t *b) {
     signed char aslide[256];
     signed char bslide[256];
     ge_cached Ai[8]; /* A,3A,5A,7A,9A,11A,13A,15A */
@@ -138,7 +138,7 @@ static const fe sqrtm1 = {
     -32595792, -7943725, 9377950, 3500415, 12389472, -272473, -25146209, -2005654, 326686, 11406482
 };
 
-int ge_frombytes_negate_vartime(ge_p3 *h, const unsigned char *s) {
+int ge_frombytes_negate_vartime(ge_p3 *h, const uint8_t *s) {
     fe u;
     fe v;
     fe v3;
@@ -318,7 +318,7 @@ void ge_p3_to_p2(ge_p2 *r, const ge_p3 *p) {
 }
 
 
-void ge_p3_tobytes(unsigned char *s, const ge_p3 *h) {
+void ge_p3_tobytes(uint8_t *s, const ge_p3 *h) {
     fe recip;
     fe x;
     fe y;
@@ -330,23 +330,23 @@ void ge_p3_tobytes(unsigned char *s, const ge_p3 *h) {
 }
 
 
-static unsigned char equal(signed char b, signed char c) {
-    unsigned char ub = b;
-    unsigned char uc = c;
-    unsigned char x = ub ^ uc; /* 0: yes; 1..255: no */
+static uint8_t equal(signed char b, signed char c) {
+    uint8_t ub = b;
+    uint8_t uc = c;
+    uint8_t x = ub ^ uc; /* 0: yes; 1..255: no */
     uint64_t y = x; /* 0: yes; 1..255: no */
     y -= 1; /* large: yes; 0..254: no */
     y >>= 63; /* 1: yes; 0: no */
-    return (unsigned char) y;
+    return (uint8_t) y;
 }
 
-static unsigned char negative(signed char b) {
+static uint8_t negative(signed char b) {
     uint64_t x = b; /* 18446744073709551361..18446744073709551615: yes; 0..255: no */
     x >>= 63; /* 1: yes; 0: no */
-    return (unsigned char) x;
+    return (uint8_t) x;
 }
 
-static void cmov(ge_precomp *t, const ge_precomp *u, unsigned char b) {
+static void cmov(ge_precomp *t, const ge_precomp *u, uint8_t b) {
     fe_cmov(t->yplusx, u->yplusx, b);
     fe_cmov(t->yminusx, u->yminusx, b);
     fe_cmov(t->xy2d, u->xy2d, b);
@@ -355,8 +355,8 @@ static void cmov(ge_precomp *t, const ge_precomp *u, unsigned char b) {
 
 static void select(ge_precomp *t, int pos, signed char b) {
     ge_precomp minust;
-    unsigned char bnegative = negative(b);
-    unsigned char babs = b - (((-bnegative) & b) << 1);
+    uint8_t bnegative = negative(b);
+    uint8_t babs = b - (((-bnegative) & b) << 1);
     fe_1(t->yplusx);
     fe_1(t->yminusx);
     fe_0(t->xy2d);
@@ -383,7 +383,7 @@ Preconditions:
   a[31] <= 127
 */
 
-void ge_scalarmult_base(ge_p3 *h, const unsigned char *a) {
+void ge_scalarmult_base(ge_p3 *h, const uint8_t *a) {
     signed char e[64];
     signed char carry;
     ge_p1p1 r;
@@ -455,7 +455,7 @@ void ge_sub(ge_p1p1 *r, const ge_p3 *p, const ge_cached *q) {
 }
 
 
-void ge_tobytes(unsigned char *s, const ge_p2 *h) {
+void ge_tobytes(uint8_t *s, const ge_p2 *h) {
     fe recip;
     fe x;
     fe y;

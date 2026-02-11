@@ -1,11 +1,11 @@
-#include "fixedint.h"
+#include <stdint.h>
 #include "fe.h"
 
 
 /*
     helper functions
 */
-static uint64_t load_3(const unsigned char *in) {
+static uint64_t load_3(const uint8_t *in) {
     uint64_t result;
 
     result = (uint64_t) in[0];
@@ -15,7 +15,7 @@ static uint64_t load_3(const unsigned char *in) {
     return result;
 }
 
-static uint64_t load_4(const unsigned char *in) {
+static uint64_t load_4(const uint8_t *in) {
     uint64_t result;
 
     result = (uint64_t) in[0];
@@ -294,7 +294,7 @@ void fe_copy(fe h, const fe f) {
     Ignores top bit of h.
 */
 
-void fe_frombytes(fe h, const unsigned char *s) {
+void fe_frombytes(fe h, const uint8_t *s) {
     int64_t h0 = load_4(s);
     int64_t h1 = load_3(s + 4) << 6;
     int64_t h2 = load_3(s + 7) << 5;
@@ -458,7 +458,7 @@ void fe_invert(fe out, const fe z) {
 */
 
 int fe_isnegative(const fe f) {
-    unsigned char s[32];
+    uint8_t s[32];
 
     fe_tobytes(s, f);
     
@@ -476,8 +476,8 @@ int fe_isnegative(const fe f) {
 */
 
 int fe_isnonzero(const fe f) {
-    unsigned char s[32];
-    unsigned char r;
+    uint8_t s[32];
+    uint8_t r;
 
     fe_tobytes(s, f);
 
@@ -1383,7 +1383,7 @@ Proof:
   so floor(2^(-255)(h + 19 2^(-25) h9 + 2^(-1))) = q.
 */
 
-void fe_tobytes(unsigned char *s, const fe h) {
+void fe_tobytes(uint8_t *s, const fe h) {
     int32_t h0 = h[0];
     int32_t h1 = h[1];
     int32_t h2 = h[2];
@@ -1456,36 +1456,36 @@ void fe_tobytes(unsigned char *s, const fe h) {
     evidently 2^255 h10-2^255 q = 0.
     Goal: Output h0+...+2^230 h9.
     */
-    s[0] = (unsigned char) (h0 >> 0);
-    s[1] = (unsigned char) (h0 >> 8);
-    s[2] = (unsigned char) (h0 >> 16);
-    s[3] = (unsigned char) ((h0 >> 24) | (h1 << 2));
-    s[4] = (unsigned char) (h1 >> 6);
-    s[5] = (unsigned char) (h1 >> 14);
-    s[6] = (unsigned char) ((h1 >> 22) | (h2 << 3));
-    s[7] = (unsigned char) (h2 >> 5);
-    s[8] = (unsigned char) (h2 >> 13);
-    s[9] = (unsigned char) ((h2 >> 21) | (h3 << 5));
-    s[10] = (unsigned char) (h3 >> 3);
-    s[11] = (unsigned char) (h3 >> 11);
-    s[12] = (unsigned char) ((h3 >> 19) | (h4 << 6));
-    s[13] = (unsigned char) (h4 >> 2);
-    s[14] = (unsigned char) (h4 >> 10);
-    s[15] = (unsigned char) (h4 >> 18);
-    s[16] = (unsigned char) (h5 >> 0);
-    s[17] = (unsigned char) (h5 >> 8);
-    s[18] = (unsigned char) (h5 >> 16);
-    s[19] = (unsigned char) ((h5 >> 24) | (h6 << 1));
-    s[20] = (unsigned char) (h6 >> 7);
-    s[21] = (unsigned char) (h6 >> 15);
-    s[22] = (unsigned char) ((h6 >> 23) | (h7 << 3));
-    s[23] = (unsigned char) (h7 >> 5);
-    s[24] = (unsigned char) (h7 >> 13);
-    s[25] = (unsigned char) ((h7 >> 21) | (h8 << 4));
-    s[26] = (unsigned char) (h8 >> 4);
-    s[27] = (unsigned char) (h8 >> 12);
-    s[28] = (unsigned char) ((h8 >> 20) | (h9 << 6));
-    s[29] = (unsigned char) (h9 >> 2);
-    s[30] = (unsigned char) (h9 >> 10);
-    s[31] = (unsigned char) (h9 >> 18);
+    s[0] = (uint8_t) (h0 >> 0);
+    s[1] = (uint8_t) (h0 >> 8);
+    s[2] = (uint8_t) (h0 >> 16);
+    s[3] = (uint8_t) ((h0 >> 24) | (h1 << 2));
+    s[4] = (uint8_t) (h1 >> 6);
+    s[5] = (uint8_t) (h1 >> 14);
+    s[6] = (uint8_t) ((h1 >> 22) | (h2 << 3));
+    s[7] = (uint8_t) (h2 >> 5);
+    s[8] = (uint8_t) (h2 >> 13);
+    s[9] = (uint8_t) ((h2 >> 21) | (h3 << 5));
+    s[10] = (uint8_t) (h3 >> 3);
+    s[11] = (uint8_t) (h3 >> 11);
+    s[12] = (uint8_t) ((h3 >> 19) | (h4 << 6));
+    s[13] = (uint8_t) (h4 >> 2);
+    s[14] = (uint8_t) (h4 >> 10);
+    s[15] = (uint8_t) (h4 >> 18);
+    s[16] = (uint8_t) (h5 >> 0);
+    s[17] = (uint8_t) (h5 >> 8);
+    s[18] = (uint8_t) (h5 >> 16);
+    s[19] = (uint8_t) ((h5 >> 24) | (h6 << 1));
+    s[20] = (uint8_t) (h6 >> 7);
+    s[21] = (uint8_t) (h6 >> 15);
+    s[22] = (uint8_t) ((h6 >> 23) | (h7 << 3));
+    s[23] = (uint8_t) (h7 >> 5);
+    s[24] = (uint8_t) (h7 >> 13);
+    s[25] = (uint8_t) ((h7 >> 21) | (h8 << 4));
+    s[26] = (uint8_t) (h8 >> 4);
+    s[27] = (uint8_t) (h8 >> 12);
+    s[28] = (uint8_t) ((h8 >> 20) | (h9 << 6));
+    s[29] = (uint8_t) (h9 >> 2);
+    s[30] = (uint8_t) (h9 >> 10);
+    s[31] = (uint8_t) (h9 >> 18);
 }

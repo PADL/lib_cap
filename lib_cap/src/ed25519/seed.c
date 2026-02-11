@@ -14,7 +14,7 @@
 
 #define SEED_LEN 32
 
-int ed25519_create_seed(unsigned char *seed) {
+int ed25519_create_seed(uint8_t *seed) {
     int ret;
 
 #ifdef _WIN32

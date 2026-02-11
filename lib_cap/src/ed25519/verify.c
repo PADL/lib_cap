@@ -3,8 +3,8 @@
 #include "ge.h"
 #include "sc.h"
 
-static int consttime_equal(const unsigned char *x, const unsigned char *y) {
-    unsigned char r = 0;
+static int consttime_equal(const uint8_t *x, const uint8_t *y) {
+    uint8_t r = 0;
 
     r = x[0] ^ y[0];
     #define F(i) r |= x[i] ^ y[i]
@@ -44,9 +44,9 @@ static int consttime_equal(const unsigned char *x, const unsigned char *y) {
     return !r;
 }
 
-int ed25519_verify(const unsigned char *signature, const unsigned char *message, size_t message_len, const unsigned char *public_key) {
-    unsigned char h[64];
-    unsigned char checker[32];
+int ed25519_verify(const uint8_t *signature, const uint8_t *message, size_t message_len, const uint8_t *public_key) {
+    uint8_t h[64];
+    uint8_t checker[32];
     sha512_context hash;
     ge_p3 A;
     ge_p2 R;
