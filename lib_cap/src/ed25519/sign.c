@@ -1,17 +1,30 @@
-#include "ed25519.h"
-#include "sha512.h"
-#include "ge.h"
-#include "sc.h"
+#include "ed25519-private.h"
 
+uint8_t dom2_prefix[32] = "SigEd25519 no Ed25519 collisions";
 
-void ed25519_sign(uint8_t *signature, const uint8_t *message, size_t message_len, const uint8_t *public_key, const uint8_t *private_key) {
+void __ed25519ctx_sign(
+    uint8_t *signature,
+    const uint8_t *message,
+    size_t message_len,
+    const uint8_t *public_key,
+    const uint8_t *private_key,
+    const uint8_t *flag, /* non-NULL indicates ed25519ctx/ed25519ph */
+    const uint8_t *context,
+    uint8_t context_len
+) {
     sha512_context hash;
     uint8_t hram[64];
     uint8_t r[64];
     ge_p3 R;
 
-
     sha512_init(&hash);
+    if (flag) {
+        sha512_update(&hash, dom2_prefix, sizeof(dom2_prefix));
+        sha512_update(&hash, flag, sizeof(*flag));
+        sha512_update(&hash, &context_len, sizeof(context_len));
+        if (context)
+            sha512_update(&hash, context, context_len);
+    }
     sha512_update(&hash, private_key + 32, 32);
     sha512_update(&hash, message, message_len);
     sha512_final(&hash, r);
@@ -21,6 +34,13 @@ void ed25519_sign(uint8_t *signature, const uint8_t *message, size_t message_len
     ge_p3_tobytes(signature, &R);
 
     sha512_init(&hash);
+    if (flag) {
+        sha512_update(&hash, dom2_prefix, sizeof(dom2_prefix));
+        sha512_update(&hash, flag, sizeof(*flag));
+        sha512_update(&hash, &context_len, sizeof(context_len));
+        if (context)
+            sha512_update(&hash, context, context_len);
+    }
     sha512_update(&hash, signature, 32);
     sha512_update(&hash, public_key, 32);
     sha512_update(&hash, message, message_len);
@@ -28,4 +48,13 @@ void ed25519_sign(uint8_t *signature, const uint8_t *message, size_t message_len
 
     sc_reduce(hram);
     sc_muladd(signature + 32, hram, private_key, r);
+}
+
+void ed25519_sign(
+    uint8_t *signature,
+    const uint8_t *message,
+    size_t message_len,
+    const uint8_t *public_key,
+    const uint8_t *private_key) {
+    __ed25519ctx_sign(signature, message, message_len, public_key, private_key, NULL, NULL, 0);
 }

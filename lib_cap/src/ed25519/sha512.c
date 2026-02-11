@@ -10,7 +10,7 @@
  */
 
 #include <stdint.h>
-#include "sha512.h"
+#include "ed25519.h"
 
 /* the K array */
 static const uint64_t K[80] = {

@@ -1,7 +1,4 @@
-#include "ed25519.h"
-#include "sha512.h"
-#include "ge.h"
-#include "sc.h"
+#include "ed25519-private.h"
 
 static int consttime_equal(const uint8_t *x, const uint8_t *y) {
     uint8_t r = 0;
@@ -44,7 +41,15 @@ static int consttime_equal(const uint8_t *x, const uint8_t *y) {
     return !r;
 }
 
-int ed25519_verify(const uint8_t *signature, const uint8_t *message, size_t message_len, const uint8_t *public_key) {
+int __ed25519ctx_verify(
+    const uint8_t *signature,
+    const uint8_t *message,
+    size_t message_len,
+    const uint8_t *public_key,
+    const uint8_t *flag, /* non-NULL indicates ed25519ctx/ed25519ph */
+    const uint8_t *context,
+    uint8_t context_len
+) {
     uint8_t h[64];
     uint8_t checker[32];
     sha512_context hash;
@@ -60,6 +65,13 @@ int ed25519_verify(const uint8_t *signature, const uint8_t *message, size_t mess
     }
 
     sha512_init(&hash);
+    if (flag) {
+        sha512_update(&hash, dom2_prefix, sizeof(dom2_prefix));
+        sha512_update(&hash, flag, sizeof(*flag));
+        sha512_update(&hash, &context_len, sizeof(context_len));
+        if (context)
+            sha512_update(&hash, context, context_len);
+    }
     sha512_update(&hash, signature, 32);
     sha512_update(&hash, public_key, 32);
     sha512_update(&hash, message, message_len);
@@ -74,4 +86,8 @@ int ed25519_verify(const uint8_t *signature, const uint8_t *message, size_t mess
     }
 
     return 1;
+}
+
+int ed25519_verify(const uint8_t *signature, const uint8_t *message, size_t message_len, const uint8_t *public_key) {
+    return __ed25519ctx_verify(signature, message, message_len, public_key, NULL, NULL, 0);
 }
