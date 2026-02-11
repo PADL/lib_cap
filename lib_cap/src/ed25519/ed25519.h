@@ -63,6 +63,7 @@ void ED25519_DECLSPEC ed25519ph_update(ed25519_context *unsafe ctx,
                                        size_t message_len);
 // the "context" string is an optional (may be NULL) string of up to 255 octets
 // that indicates the context in which the sign/verify operation is being used
+// note also that these functions are destructive; they can only be called once
 void ED25519_DECLSPEC ed25519ph_sign(ed25519_context *unsafe ctx,
                                      uint8_t *unsafe signature,
                                      const uint8_t *unsafe context,
