@@ -23,6 +23,8 @@
 
 #include "ed25519-private.h"
 
+uint8_t dom2_prefix[32] = "SigEd25519 no Ed25519 collisions";
+
 #define Flag_Ed25519ctx 0
 #define Flag_Ed25519ph 1
 
