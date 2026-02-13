@@ -44,8 +44,8 @@ void ed25519ph_sign(ed25519_context *ctx,
   uint8_t digest[64];
 
   sha512_final(&ctx->hash, digest);
-  __ed25519ctx_sign(signature, digest, sizeof(digest), public_key,
-                    private_key, &flag, context, context_len);
+  __ed25519ctx_sign(signature, digest, sizeof(digest), public_key, private_key,
+                    &flag, context, context_len);
 }
 
 int ed25519ph_verify(ed25519_context *ctx,

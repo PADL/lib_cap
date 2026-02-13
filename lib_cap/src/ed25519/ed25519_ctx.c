@@ -26,24 +26,24 @@
 static const uint8_t flag = Flag_Ed25519ctx;
 
 void ed25519ctx_sign(ed25519_context *ctx,
-                    uint8_t *signature,
-                    const uint8_t *context,
-                    uint8_t context_len,
-                    const uint8_t *message,
-                    uint8_t message_len,
-                    const uint8_t *public_key,
-                    const uint8_t *private_key) {
-  __ed25519ctx_sign(signature, message, message_len, public_key,
-                    private_key, &flag, context, context_len);
-}
-
-int ed25519ctx_verify(ed25519_context *ctx,
-                     const uint8_t *signature,
+                     uint8_t *signature,
                      const uint8_t *context,
                      uint8_t context_len,
                      const uint8_t *message,
                      uint8_t message_len,
-                     const uint8_t *public_key) {
-  return __ed25519ctx_verify(signature, message, message_len, public_key,
-                             &flag, context, context_len);
+                     const uint8_t *public_key,
+                     const uint8_t *private_key) {
+  __ed25519ctx_sign(signature, message, message_len, public_key, private_key,
+                    &flag, context, context_len);
+}
+
+int ed25519ctx_verify(ed25519_context *ctx,
+                      const uint8_t *signature,
+                      const uint8_t *context,
+                      uint8_t context_len,
+                      const uint8_t *message,
+                      uint8_t message_len,
+                      const uint8_t *public_key) {
+  return __ed25519ctx_verify(signature, message, message_len, public_key, &flag,
+                             context, context_len);
 }
