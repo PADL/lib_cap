@@ -51,4 +51,7 @@ int __ed25519ctx_verify(
     const uint8_t *context,
     uint8_t context_len);
 
+#define Flag_Ed25519ctx 0
+#define Flag_Ed25519ph 1
+
 #endif

@@ -100,6 +100,20 @@ int ED25519_DECLSPEC ed25519ph_verify(ed25519_context *unsafe ctx,
                                       uint8_t context_len,
                                       const uint8_t *unsafe public_key);
 
+void ED25519_DECLSPEC ed25519ctx_sign(uint8_t *unsafe signature,
+                                      const uint8_t *unsafe context,
+                                      uint8_t context_len,
+                                      const uint8_t *unsafe message,
+                                      size_t message_len,
+                                      const uint8_t *unsafe public_key,
+                                      const uint8_t *unsafe private_key);
+int ED25519_DECLSPEC ed25519ctx_verify(const uint8_t *unsafe signature,
+                                       const uint8_t *unsafe context,
+                                       uint8_t context_len,
+                                       const uint8_t *unsafe message,
+                                       size_t message_len,
+                                       const uint8_t *unsafe public_key);
+
 #ifndef __XC__
 #undef unsafe
 #endif
